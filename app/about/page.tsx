@@ -206,7 +206,7 @@ export default function AboutPage() {
       </section>
 
       <footer className="bg-[#193726] px-6 py-7 text-center text-sm text-white/70">
-        © {new Date().getFullYear()} Naira Agro. All rights reserved.
+        © 2026 Naira Agro. All rights reserved.
       </footer>
     </main>
   );
