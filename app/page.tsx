@@ -1,4 +1,4 @@
-
+import Link from "next/link";
 import Header from "../components/Header";
 
 const honeyImage =
@@ -6,8 +6,10 @@ const honeyImage =
 
 const moringaImage =
   "https://www.pipagro.com/cdn/shop/files/E76E9555-3FDC-47EB-B9C9-75E7C2DC6FE6.png?v=1776944465";
- const farmImage =
+
+const farmImage =
   "https://media.istockphoto.com/id/2194911890/photo/back-lit-silhouette-of-male-farmer-standing-in-cultivated-soybean-field-in-summer-sunset.jpg?s=612x612&w=0&k=20&c=zgL3Yhxx4chRBdI0szfckOKWO4I8NU8gqrYQKYNze8k=";
+
 export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#fcfbf7] text-[#244b35]">
@@ -65,12 +67,12 @@ export default function Home() {
 
           <div className="mt-10 flex flex-wrap gap-x-7 gap-y-4 border-t border-[#e5e8dd] pt-6">
             <div className="flex items-center gap-2 text-sm text-[#526453]">
-              <span className="text-lg">🌿</span>
-              Nature-inspired
+              <span className="text-lg"></span>
+              
             </div>
             <div className="flex items-center gap-2 text-sm text-[#526453]">
-              <span className="text-lg">🍯</span>
-              Honey & Moringa
+              <span className="text-lg"></span>
+              
             </div>
           </div>
         </div>
@@ -199,7 +201,7 @@ export default function Home() {
             thoughtful, simple and connected to nature.
           </p>
 
-          <a
+          <Link
             href="/about"
             className="group mt-7 inline-flex items-center gap-3 border-b border-[#71965b] pb-2 text-sm font-bold transition hover:text-[#71965b]"
           >
@@ -207,7 +209,7 @@ export default function Home() {
             <span className="transition-transform group-hover:translate-x-1">
               →
             </span>
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -267,12 +269,12 @@ export default function Home() {
                   become part of your favourite everyday moments.
                 </p>
 
-                <a
-                  href="/contact"
-                  className="mt-6 inline-flex items-center gap-3 rounded-full bg-[#244b35] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#193726]"
+                <Link
+                  href="/products"
+                  className="mt-6 inline-flex items-center gap-3 rounded-full bg-[#244b35] px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-[#193726]"
                 >
-                  Enquire About Honey <span>→</span>
-                </a>
+                  Shop Honey <span>→</span>
+                </Link>
               </div>
             </article>
 
@@ -309,14 +311,23 @@ export default function Home() {
                   everyday recipes.
                 </p>
 
-                <a
-                  href="/contact"
-                  className="mt-6 inline-flex items-center gap-3 rounded-full bg-[#244b35] px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-[#193726]"
+                <Link
+                  href="/products"
+                  className="mt-6 inline-flex items-center gap-3 rounded-full bg-[#244b35] px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-[#193726]"
                 >
-                  Enquire About Moringa <span>→</span>
-                </a>
+                  Shop Moringa <span>→</span>
+                </Link>
               </div>
             </article>
+          </div>
+
+          <div className="mt-9 text-center">
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-3 rounded-full border border-[#244b35] px-7 py-3.5 text-sm font-semibold text-[#244b35] transition hover:bg-[#244b35] hover:text-white"
+            >
+              View All Products <span>→</span>
+            </Link>
           </div>
 
           <p className="mt-7 text-center text-xs leading-6 text-[#687268]">
@@ -348,12 +359,12 @@ export default function Home() {
                 your kitchen.
               </p>
 
-              <a
+              <Link
                 href="/about"
                 className="mt-8 inline-flex w-fit items-center gap-3 rounded-full bg-[#f0f3e9] px-6 py-3.5 text-sm font-bold text-[#244b35] transition hover:bg-white"
               >
                 Meet Naira Agro <span>→</span>
-              </a>
+              </Link>
             </div>
 
             <div className="relative min-h-[300px] overflow-hidden sm:min-h-[400px]">
@@ -397,19 +408,19 @@ export default function Home() {
           </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <a
+            <Link
               href="/contact"
               className="inline-flex items-center gap-3 rounded-full bg-[#244b35] px-7 py-4 text-sm font-semibold text-white shadow-lg transition hover:-translate-y-1 hover:bg-[#193726]"
             >
               Get in Touch <span>→</span>
-            </a>
+            </Link>
 
-            <a
+            <Link
               href="/products"
               className="inline-flex items-center rounded-full border border-[#b9c8ae] px-7 py-4 text-sm font-semibold transition hover:bg-white"
             >
               Browse Products
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -418,12 +429,12 @@ export default function Home() {
       <footer className="bg-[#142b1e] px-5 pb-7 pt-12 text-white sm:px-8">
         <div className="mx-auto grid max-w-7xl gap-9 border-b border-white/15 pb-9 sm:grid-cols-2 lg:grid-cols-3">
           <div>
-            <a href="/" className="inline-flex items-center gap-3">
+            <Link href="/" className="inline-flex items-center gap-3">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#dce8cf] text-xl text-[#244b35]">
                 ✳
               </span>
               <span className="font-serif text-3xl">Naira Agro</span>
-            </a>
+            </Link>
 
             <p className="mt-4 max-w-sm text-sm leading-7 text-white/65">
               Inspired by the farm. Bringing the natural character of honey
@@ -434,10 +445,18 @@ export default function Home() {
           <div>
             <h3 className="font-semibold">Explore</h3>
             <div className="mt-4 flex flex-col items-start gap-3 text-sm text-white/65">
-              <a href="/" className="transition hover:text-white">Home</a>
-              <a href="/about" className="transition hover:text-white">Our Story</a>
-              <a href="/products" className="transition hover:text-white">Products</a>
-              <a href="/contact" className="transition hover:text-white">Contact</a>
+              <Link href="/" className="transition hover:text-white">
+                Home
+              </Link>
+              <Link href="/about" className="transition hover:text-white">
+                Our Story
+              </Link>
+              <Link href="/products" className="transition hover:text-white">
+                Products
+              </Link>
+              <Link href="/contact" className="transition hover:text-white">
+                Contact
+              </Link>
             </div>
           </div>
 
@@ -448,12 +467,12 @@ export default function Home() {
               <br />
               Moringa Powder
             </p>
-            <a
+            <Link
               href="/contact"
               className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#c6d9b5] transition hover:text-white"
             >
               Ask us a question <span>→</span>
-            </a>
+            </Link>
           </div>
         </div>
 
