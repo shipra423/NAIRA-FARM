@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import Header from "../components/Header";
 
@@ -68,11 +69,9 @@ export default function Home() {
           <div className="mt-10 flex flex-wrap gap-x-7 gap-y-4 border-t border-[#e5e8dd] pt-6">
             <div className="flex items-center gap-2 text-sm text-[#526453]">
               <span className="text-lg"></span>
-              
             </div>
             <div className="flex items-center gap-2 text-sm text-[#526453]">
               <span className="text-lg"></span>
-              
             </div>
           </div>
         </div>
@@ -269,12 +268,21 @@ export default function Home() {
                   become part of your favourite everyday moments.
                 </p>
 
-                <Link
-                  href="/products"
-                  className="mt-6 inline-flex items-center gap-3 rounded-full bg-[#244b35] px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-[#193726]"
-                >
-                  Shop Honey <span>→</span>
-                </Link>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Link
+                    href="/products"
+                    className="inline-flex items-center gap-3 rounded-full bg-[#244b35] px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-[#193726]"
+                  >
+                    Shop Honey <span>→</span>
+                  </Link>
+
+                  <Link
+                    href="/products?buyNow=Raw%20Wildflower%20Honey"
+                    className="inline-flex items-center gap-3 rounded-full border border-[#244b35] px-6 py-3.5 text-sm font-semibold text-[#244b35] transition hover:-translate-y-1 hover:bg-[#edf2e7]"
+                  >
+                    Buy Now <span>→</span>
+                  </Link>
+                </div>
               </div>
             </article>
 
@@ -311,12 +319,21 @@ export default function Home() {
                   everyday recipes.
                 </p>
 
-                <Link
-                  href="/products"
-                  className="mt-6 inline-flex items-center gap-3 rounded-full bg-[#244b35] px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-[#193726]"
-                >
-                  Shop Moringa <span>→</span>
-                </Link>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Link
+                    href="/products"
+                    className="inline-flex items-center gap-3 rounded-full bg-[#244b35] px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-[#193726]"
+                  >
+                    Shop Moringa <span>→</span>
+                  </Link>
+
+                  <Link
+                    href="/products?buyNow=Moringa%20Powder"
+                    className="inline-flex items-center gap-3 rounded-full border border-[#244b35] px-6 py-3.5 text-sm font-semibold text-[#244b35] transition hover:-translate-y-1 hover:bg-[#edf2e7]"
+                  >
+                    Buy Now <span>→</span>
+                  </Link>
+                </div>
               </div>
             </article>
           </div>

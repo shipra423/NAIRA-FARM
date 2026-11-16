@@ -308,6 +308,30 @@ export default function ProductsPage() {
     setCheckoutOpen(true);
   };
 
+  // Direct checkout from Home Page Buy Now buttons
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const productName = params.get("buyNow");
+
+    if (!productName) return;
+
+    const selectedProduct = products.find(
+      (product) => product.name === productName
+    );
+
+    if (!selectedProduct) return;
+
+    // Remove query parameter after reading it
+    window.history.replaceState(
+      {},
+      "",
+      window.location.pathname
+    );
+
+    // Open full-screen checkout directly
+    buyNow(selectedProduct);
+  }, [buyNow]);
+
   const updateQuantity = (name: string, change: number) => {
     setCart((current) =>
       current
