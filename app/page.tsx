@@ -268,14 +268,7 @@ export default function Home() {
                   become part of your favourite everyday moments.
                 </p>
 
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Link
-                    href="/products"
-                    className="inline-flex items-center gap-3 rounded-full bg-[#244b35] px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-[#193726]"
-                  >
-                    Shop Honey <span>→</span>
-                  </Link>
-
+                <div className="mt-6">
                   <Link
                     href="/products?buyNow=Raw%20Wildflower%20Honey"
                     className="inline-flex items-center gap-3 rounded-full border border-[#244b35] px-6 py-3.5 text-sm font-semibold text-[#244b35] transition hover:-translate-y-1 hover:bg-[#edf2e7]"
@@ -319,14 +312,7 @@ export default function Home() {
                   everyday recipes.
                 </p>
 
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Link
-                    href="/products"
-                    className="inline-flex items-center gap-3 rounded-full bg-[#244b35] px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-1 hover:bg-[#193726]"
-                  >
-                    Shop Moringa <span>→</span>
-                  </Link>
-
+                <div className="mt-6">
                   <Link
                     href="/products?buyNow=Moringa%20Powder"
                     className="inline-flex items-center gap-3 rounded-full border border-[#244b35] px-6 py-3.5 text-sm font-semibold text-[#244b35] transition hover:-translate-y-1 hover:bg-[#edf2e7]"
