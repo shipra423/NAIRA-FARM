@@ -1,9 +1,9 @@
-
 "use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import Header from "../../components/Header";
+import { api } from "../../lib/api";
 
 type Product = {
   name: string;
@@ -31,117 +31,42 @@ type Customer = {
   email: string;
 };
 
-const products: Product[] = [
-  {
-    name: "Raw Wildflower Honey",
-    subtitle: "Pure golden goodness",
-    description: "Natural sweetness for your everyday table and favourite recipes.",
-    image: "https://therawkitchenuk.com/cdn/shop/files/1235199.png?v=1767044964&width=1200",
-    alt: "Raw wildflower honey jar",
-    tag: "FROM THE HIVES",
-    price: 399,
-    featured: true,
-    featuredOrder: 1,
-    category: "Honey",
-  },
-  {
-    name: "Moringa Powder",
-    subtitle: "Green goodness from nature",
-    description: "A versatile green powder for smoothies, drinks and everyday recipes.",
-    image: "https://www.pipagro.com/cdn/shop/files/E76E9555-3FDC-47EB-B9C9-75E7C2DC6FE6.png?v=1776944465",
-    alt: "Moringa powder",
-    tag: "FROM THE FARM",
-    price: 249,
-    featured: true,
-    featuredOrder: 2,
-    category: "Organic Foods",
-  },
-  {
-    name: "Organic Pulses & Dals",
-    subtitle: "Wholesome everyday essentials",
-    description: "Explore pulses and dals for everyday home-cooked meals.",
-    image: "https://images.unsplash.com/photo-1515543904379-3d757afe72e4?auto=format&fit=crop&w=1000&q=85",
-    alt: "Assorted pulses",
-    tag: "FARM FRESH",
-    price: 149,
-    featured: true,
-    featuredOrder: 3,
-    category: "Organic Foods",
-  },
-  {
-    name: "Organic Dairy Products",
-    subtitle: "Fresh goodness from the farm",
-    description: "Explore dairy offerings such as milk, ghee, butter and paneer.",
-    image: "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=1000&q=85",
-    alt: "Dairy products",
-    tag: "DAIRY",
-    price: 199,
-    featured: false,
-    featuredOrder: 4,
-    category: "Dairy",
-  },
-  {
-    name: "Farm-Fresh Cereals",
-    subtitle: "Wholesome grains",
-    description: "Explore everyday grains such as wheat, rice and millets.",
-    image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=1000&q=85",
-    alt: "Wheat grains",
-    tag: "FARM HARVEST",
-    price: 129,
-    featured: false,
-    featuredOrder: 5,
-    category: "Grains",
-  },
-  {
-    name: "Fresh Fruits",
-    subtitle: "Nature's colourful goodness",
-    description: "Explore seasonal fruits and fresh farm produce.",
-    image: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=1000&q=85",
-    alt: "Fresh tropical fruits",
-    tag: "SEASONAL",
-    price: 99,
-    featured: false,
-    featuredOrder: 6,
-    category: "Fruits",
-  },
-  {
-    name: "Sahiwal & Gir Cows",
-    subtitle: "Indigenous Indian cattle breeds",
-    description: "Enquire about cattle breeds and current farm availability.",
-    image: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=1000&q=85",
-    alt: "Cattle on a farm",
-    tag: "LIVESTOCK",
-    price: 0,
-    featured: false,
-    featuredOrder: 7,
-    category: "Livestock",
-  },
-  {
-    name: "Kadaknath Chicken & Eggs",
-    subtitle: "Farm poultry",
-    description: "Enquire about Kadaknath poultry and eggs, subject to availability.",
-    image: "https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&w=1000&q=85",
-    alt: "Farm poultry",
-    tag: "POULTRY",
-    price: 0,
-    featured: false,
-    featuredOrder: 8,
-    category: "Poultry",
-  },
-];
+// Webrix API ka product format
+type ApiProduct = {
+  id: number;
+  name: string;
+  price: string;
+  discounted_price: string | null;
+  is_featured: boolean;
+  image: string | null;
+  short_description?: string;
+  category_detail?: { name: string } | null;
+};
 
-const categories = [
-  "All Products",
-  "Honey",
-  "Organic Foods",
-  "Dairy",
-  "Grains",
-  "Fruits",
-  "Livestock",
-  "Poultry",
-];
+// API product ko page ke Product format mein badalta hai
+function mapProduct(p: ApiProduct, index: number): Product {
+  const category = p.category_detail?.name || "Other";
+
+  return {
+    name: p.name,
+    subtitle: category,
+    description: p.short_description || "",
+    image: p.image || "",
+    alt: p.name,
+    tag: category.toUpperCase(),
+    price: Number(p.discounted_price || p.price) || 0,
+    featured: p.is_featured,
+    featuredOrder: index + 1,
+    category,
+  };
+}
 
 export default function ProductsPage() {
+  // Products from Webrix API
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -165,6 +90,28 @@ export default function ProductsPage() {
   });
 
   const [errors, setErrors] = useState<Partial<Customer>>({});
+
+  // Fetch products from API
+  useEffect(() => {
+    api("/products/")
+      .then((data) => {
+        const list = (data.results || []) as ApiProduct[];
+        setProducts(list.map(mapProduct));
+      })
+      .catch(() =>
+        setLoadError("Products could not be loaded. Please try again.")
+      )
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Categories come from the products
+  const categories = useMemo(
+    () => [
+      "All Products",
+      ...Array.from(new Set(products.map((p) => p.category))),
+    ],
+    [products]
+  );
 
   // Load saved cart
   useEffect(() => {
@@ -309,7 +256,10 @@ export default function ProductsPage() {
   };
 
   // Direct checkout from Home Page Buy Now buttons
+  // Runs only after products are loaded from the API
   useEffect(() => {
+    if (products.length === 0) return;
+
     const params = new URLSearchParams(window.location.search);
     const productName = params.get("buyNow");
 
@@ -322,15 +272,12 @@ export default function ProductsPage() {
     if (!selectedProduct) return;
 
     // Remove query parameter after reading it
-    window.history.replaceState(
-      {},
-      "",
-      window.location.pathname
-    );
+    window.history.replaceState({}, "", window.location.pathname);
 
     // Open full-screen checkout directly
     buyNow(selectedProduct);
-  }, [buyNow]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products]);
 
   const updateQuantity = (name: string, change: number) => {
     setCart((current) =>
@@ -402,7 +349,7 @@ export default function ProductsPage() {
             return 0;
         }
       });
-  }, [searchTerm, selectedCategory, minPrice, maxPrice, sortBy]);
+  }, [products, searchTerm, selectedCategory, minPrice, maxPrice, sortBy]);
 
   const clearAllFilters = () => {
     setSearchTerm("");
@@ -417,10 +364,7 @@ export default function ProductsPage() {
     maxPrice !== "" &&
     Number(minPrice) > Number(maxPrice);
 
-  const totalItems = cart.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -445,12 +389,8 @@ export default function ProductsPage() {
       newErrors.phone = "Enter a valid 10-digit mobile number";
     }
 
-    if (
-      !customer.address.trim() ||
-      customer.address.trim().length < 10
-    ) {
-      newErrors.address =
-        "Enter a complete address (minimum 10 characters)";
+    if (!customer.address.trim() || customer.address.trim().length < 10) {
+      newErrors.address = "Enter a complete address (minimum 10 characters)";
     }
 
     if (
@@ -496,10 +436,7 @@ Total: ₹${checkoutTotal}
 
 Please confirm my order and delivery details.`;
 
-    window.open(
-      "https://wa.me/?text=" + encodeURIComponent(message),
-      "_blank"
-    );
+    window.open("https://wa.me/?text=" + encodeURIComponent(message), "_blank");
 
     setCheckoutOpen(false);
     setCartOpen(false);
@@ -510,7 +447,6 @@ Please confirm my order and delivery details.`;
 
   return (
     <main className="min-h-screen bg-[#fcfbf7] text-[#244b35]">
-
       {/* Toast */}
       {toast && (
         <div
@@ -544,9 +480,7 @@ Please confirm my order and delivery details.`;
           >
             <div className="flex items-center justify-between border-b pb-5">
               <div>
-                <h2 className="text-2xl font-bold">
-                  Your Shopping Cart
-                </h2>
+                <h2 className="text-2xl font-bold">Your Shopping Cart</h2>
                 <p className="text-sm text-gray-500">
                   {totalItems} items in your cart
                 </p>
@@ -564,9 +498,7 @@ Please confirm my order and delivery details.`;
             {cart.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center">
                 <span className="text-5xl">🛒</span>
-                <p className="mt-4 font-semibold">
-                  Your cart is empty
-                </p>
+                <p className="mt-4 font-semibold">Your cart is empty</p>
 
                 <button
                   onClick={() => setCartOpen(false)}
@@ -651,22 +583,16 @@ Please confirm my order and delivery details.`;
       {/* FULL SCREEN CHECKOUT */}
       {checkoutOpen && (
         <div className="fixed inset-0 z-[110] h-screen w-full overflow-y-auto bg-[#fcfbf7]">
-
           <div className="min-h-screen w-full px-5 py-8 md:px-12 lg:px-20">
-
             <div className="mx-auto max-w-6xl">
-
               {/* Checkout Header */}
               <div className="mb-8 flex items-center justify-between border-b border-green-900/10 pb-6">
-
                 <div>
                   <p className="font-semibold tracking-widest text-[#71965b]">
                     NAIRA AGRO
                   </p>
 
-                  <h2 className="mt-2 text-3xl font-bold">
-                    Checkout Details
-                  </h2>
+                  <h2 className="mt-2 text-3xl font-bold">Checkout Details</h2>
 
                   <p className="mt-2 text-gray-500">
                     Complete your details to place your order.
@@ -680,24 +606,16 @@ Please confirm my order and delivery details.`;
                 >
                   ×
                 </button>
-
               </div>
 
               <div className="grid gap-10 lg:grid-cols-[1.5fr_1fr]">
-
                 {/* Customer Form */}
                 <div className="rounded-3xl bg-white p-6 shadow-sm md:p-9">
-
                   <h3 className="mb-6 text-2xl font-bold">
                     Delivery Information
                   </h3>
 
-                  <form
-                    onSubmit={placeOrder}
-                    noValidate
-                    className="space-y-5"
-                  >
-
+                  <form onSubmit={placeOrder} noValidate className="space-y-5">
                     <div>
                       <label className="mb-2 block font-medium">
                         Full Name *
@@ -807,30 +725,24 @@ Please confirm my order and delivery details.`;
                     </button>
 
                     <p className="text-center text-xs text-gray-500">
-                      Your order details will be shared with Naira Agro through WhatsApp.
+                      Your order details will be shared with Naira Agro through
+                      WhatsApp.
                     </p>
-
                   </form>
                 </div>
 
                 {/* Order Summary */}
                 <div className="h-fit rounded-3xl bg-white p-6 shadow-sm md:p-8">
-
-                  <h3 className="mb-6 text-2xl font-bold">
-                    Order Summary
-                  </h3>
+                  <h3 className="mb-6 text-2xl font-bold">Order Summary</h3>
 
                   <div className="space-y-5">
-
                     {checkoutItems.map((item) => (
                       <div
                         key={item.name}
                         className="flex justify-between gap-4 border-b border-gray-100 pb-5"
                       >
                         <div>
-                          <h4 className="font-semibold">
-                            {item.name}
-                          </h4>
+                          <h4 className="font-semibold">{item.name}</h4>
 
                           <p className="mt-1 text-sm text-gray-500">
                             Quantity: {item.quantity}
@@ -846,11 +758,9 @@ Please confirm my order and delivery details.`;
                         </p>
                       </div>
                     ))}
-
                   </div>
 
                   <div className="mt-6 space-y-3 border-t border-gray-200 pt-5">
-
                     <div className="flex justify-between text-gray-600">
                       <span>Subtotal</span>
                       <span>₹{checkoutTotal}</span>
@@ -865,19 +775,17 @@ Please confirm my order and delivery details.`;
                       <span>Total</span>
                       <span>₹{checkoutTotal}</span>
                     </div>
-
                   </div>
 
                   <div className="mt-6 rounded-2xl bg-[#edf2e7] p-5">
-
                     <p className="font-semibold">
                       🌿 Thank you for choosing Naira Agro!
                     </p>
 
                     <p className="mt-2 text-sm leading-6 text-gray-600">
-                      Order confirmation and delivery details will be handled by the Naira Agro team.
+                      Order confirmation and delivery details will be handled by
+                      the Naira Agro team.
                     </p>
-
                   </div>
 
                   <button
@@ -886,25 +794,17 @@ Please confirm my order and delivery details.`;
                   >
                     ← Continue Shopping
                   </button>
-
                 </div>
-
               </div>
-
             </div>
-
           </div>
-
         </div>
       )}
 
       {/* COMBINED SEARCH + FILTER */}
       <section className="mx-auto max-w-7xl px-6 pt-8">
-
         <div className="flex flex-col gap-3 rounded-2xl border border-green-900/10 bg-white p-4 shadow-sm sm:flex-row">
-
           <div className="relative flex-1">
-
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl">
               🔍
             </span>
@@ -916,7 +816,6 @@ Please confirm my order and delivery details.`;
               placeholder="Search honey, moringa, fruits, dairy..."
               className="w-full rounded-xl border border-green-900/20 bg-[#fcfbf7] py-3 pl-12 pr-4 text-[#244b35] outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
             />
-
           </div>
 
           <button
@@ -925,14 +824,10 @@ Please confirm my order and delivery details.`;
           >
             ☰ Filters & Sorting
           </button>
-
         </div>
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500">
-
-          <span>
-            Showing {filteredProducts.length} products
-          </span>
+          <span>Showing {filteredProducts.length} products</span>
 
           <button
             onClick={clearAllFilters}
@@ -940,14 +835,11 @@ Please confirm my order and delivery details.`;
           >
             Clear Search & Filters ↺
           </button>
-
         </div>
-
       </section>
 
       {/* PRODUCTS + FILTER DRAWER */}
       <section className="mx-auto max-w-7xl px-6 pb-20 pt-8">
-
         {/* FILTER DRAWER */}
         <div
           className={`fixed inset-0 z-[90] transition-all duration-500 ease-out ${
@@ -956,7 +848,6 @@ Please confirm my order and delivery details.`;
               : "invisible bg-black/0 opacity-0"
           }`}
         >
-
           <button
             type="button"
             aria-label="Close filters"
@@ -969,17 +860,11 @@ Please confirm my order and delivery details.`;
               mobileFiltersOpen ? "translate-x-0" : "-translate-x-full"
             }`}
           >
-
             <div className="rounded-2xl border border-green-900/10 bg-white p-5 shadow-sm">
-
               <div className="mb-5 flex items-center justify-between">
-
-                <h2 className="text-xl font-bold">
-                  Filters
-                </h2>
+                <h2 className="text-xl font-bold">Filters</h2>
 
                 <div className="flex items-center gap-4">
-
                   <button
                     onClick={clearAllFilters}
                     className="text-sm font-semibold text-[#71965b] hover:underline"
@@ -994,26 +879,19 @@ Please confirm my order and delivery details.`;
                   >
                     ×
                   </button>
-
                 </div>
-
               </div>
 
               {/* Category */}
               <div>
-
-                <h3 className="mb-4 font-bold">
-                  Shop by Category
-                </h3>
+                <h3 className="mb-4 font-bold">Shop by Category</h3>
 
                 <div className="space-y-3">
-
                   {categories.map((category) => (
                     <label
                       key={category}
                       className="flex cursor-pointer items-center gap-3 text-sm text-gray-700 hover:text-[#244b35]"
                     >
-
                       <input
                         type="radio"
                         name="category"
@@ -1023,27 +901,19 @@ Please confirm my order and delivery details.`;
                       />
 
                       {category}
-
                     </label>
                   ))}
-
                 </div>
-
               </div>
 
               <div className="my-6 border-t border-gray-100" />
 
               {/* Price */}
               <div>
-
-                <h3 className="mb-4 font-bold">
-                  Filter by Price (₹)
-                </h3>
+                <h3 className="mb-4 font-bold">Filter by Price (₹)</h3>
 
                 <div className="grid grid-cols-2 gap-2">
-
                   <div>
-
                     <label className="mb-1 block text-xs text-gray-500">
                       Minimum
                     </label>
@@ -1056,11 +926,9 @@ Please confirm my order and delivery details.`;
                       placeholder="Min price"
                       className="w-full rounded-xl border border-green-900/20 px-3 py-3 text-sm outline-none focus:border-green-700"
                     />
-
                   </div>
 
                   <div>
-
                     <label className="mb-1 block text-xs text-gray-500">
                       Maximum
                     </label>
@@ -1073,27 +941,22 @@ Please confirm my order and delivery details.`;
                       placeholder="Max price"
                       className="w-full rounded-xl border border-green-900/20 px-3 py-3 text-sm outline-none focus:border-green-700"
                     />
-
                   </div>
-
                 </div>
 
                 {invalidPriceRange && (
                   <p className="mt-2 text-xs text-red-600">
-                    Maximum price must be greater than or equal to minimum price.
+                    Maximum price must be greater than or equal to minimum
+                    price.
                   </p>
                 )}
-
               </div>
 
               <div className="my-6 border-t border-gray-100" />
 
               {/* Sorting */}
               <div>
-
-                <h3 className="mb-3 font-bold">
-                  Sort Products
-                </h3>
+                <h3 className="mb-3 font-bold">Sort Products</h3>
 
                 <select
                   value={sortBy}
@@ -1105,7 +968,6 @@ Please confirm my order and delivery details.`;
                   <option value="high">Price: High to Low</option>
                   <option value="az">Name: A to Z</option>
                 </select>
-
               </div>
 
               <button
@@ -1122,39 +984,35 @@ Please confirm my order and delivery details.`;
               >
                 Show {filteredProducts.length} Products
               </button>
-
             </div>
-
           </aside>
-
         </div>
 
         {/* PRODUCTS AREA */}
         <div className="min-w-0 w-full flex-1">
-
           <div className="mb-6">
-
             <h2 className="text-xl font-bold"></h2>
 
             <p className="mt-1 text-sm text-gray-600"></p>
-
           </div>
 
-          {invalidPriceRange ? (
-
+          {loading ? (
+            <p className="rounded-xl bg-white p-8 text-center text-gray-600">
+              Loading products...
+            </p>
+          ) : loadError ? (
+            <p className="rounded-xl bg-white p-8 text-center text-red-600">
+              {loadError}
+            </p>
+          ) : invalidPriceRange ? (
             <p className="rounded-xl bg-white p-8 text-center text-gray-600">
               Maximum price must be greater than or equal to minimum price.
             </p>
-
           ) : filteredProducts.length === 0 ? (
-
             <div className="rounded-3xl bg-white px-6 py-16 text-center shadow-sm">
-
               <p className="text-4xl">🌿</p>
 
-              <h2 className="mt-4 text-2xl font-bold">
-                No Products Found
-              </h2>
+              <h2 className="mt-4 text-2xl font-bold">No Products Found</h2>
 
               <p className="mt-3 text-gray-500">
                 Try another search or category.
@@ -1166,31 +1024,23 @@ Please confirm my order and delivery details.`;
               >
                 Clear Filters
               </button>
-
             </div>
-
           ) : (
-
             <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
-
               {filteredProducts.map((product) => (
-
                 <article
                   key={product.name}
                   className="group overflow-hidden rounded-3xl border border-green-900/10 bg-white shadow-sm transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-2xl"
                 >
-
                   {/* Product Image */}
                   <div className="relative flex h-80 items-center justify-center overflow-hidden bg-[#f5f3e9] p-3">
-
-                    {failedImages.includes(product.name) ? (
-
+                    {!product.image || failedImages.includes(product.name) ? (
                       <div className="px-6 text-center text-sm text-gray-500">
-                        Image could not load. Please check your internet connection.
+                        {product.image
+                          ? "Image could not load. Please check your internet connection."
+                          : "No image available"}
                       </div>
-
                     ) : (
-
                       <img
                         src={product.image}
                         alt={product.alt}
@@ -1204,7 +1054,6 @@ Please confirm my order and delivery details.`;
                           )
                         }
                       />
-
                     )}
 
                     <span className="absolute left-5 top-5 rounded-full bg-white/95 px-4 py-2 text-xs font-bold tracking-wider text-[#244b35]">
@@ -1216,12 +1065,10 @@ Please confirm my order and delivery details.`;
                         FEATURED
                       </span>
                     )}
-
                   </div>
 
                   {/* Product Details */}
                   <div className="p-7 md:p-9">
-
                     <p className="text-sm font-semibold text-[#71965b]">
                       {product.subtitle}
                     </p>
@@ -1235,23 +1082,13 @@ Please confirm my order and delivery details.`;
                     </p>
 
                     {product.price > 0 ? (
-
                       <p className="mt-5 text-2xl font-bold">
-
                         ₹{product.price}
-
-                        <span className="ml-2 text-sm font-normal text-gray-500">
-                          (sample price)
-                        </span>
-
                       </p>
-
                     ) : (
-
                       <p className="mt-5 text-lg font-semibold">
                         Price on enquiry
                       </p>
-
                     )}
 
                     {/* Add to Cart */}
@@ -1273,30 +1110,21 @@ Please confirm my order and delivery details.`;
                         Buy Now →
                       </button>
                     )}
-
                   </div>
-
                 </article>
-
               ))}
-
             </div>
-
           )}
-
         </div>
-
       </section>
 
       {/* Contact */}
       <section className="bg-[#edf2e7] px-6 py-14 text-center">
-
-        <h2 className="text-3xl font-bold">
-          Goodness worth sharing
-        </h2>
+        <h2 className="text-3xl font-bold">Goodness worth sharing</h2>
 
         <p className="mx-auto mt-4 max-w-xl leading-7 text-gray-600">
-          Have questions about our products? Get in touch with the Naira Agro team.
+          Have questions about our products? Get in touch with the Naira Agro
+          team.
         </p>
 
         <Link
@@ -1305,14 +1133,12 @@ Please confirm my order and delivery details.`;
         >
           Contact Us
         </Link>
-
       </section>
 
       {/* Footer */}
       <footer className="bg-[#193726] px-6 py-7 text-center text-sm text-white/70">
         © 2026 Naira Agro. All rights reserved.
       </footer>
-
     </main>
   );
 }
