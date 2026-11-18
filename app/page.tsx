@@ -1,12 +1,9 @@
-
 import Link from "next/link";
 import Header from "../components/Header";
 
-const honeyImage =
-  "https://therawkitchenuk.com/cdn/shop/files/1235199.png?v=1767044964&width=1200";
+const honeyImage = "/images/honey.jpeg";
 
-const moringaImage =
-  "https://www.pipagro.com/cdn/shop/files/E76E9555-3FDC-47EB-B9C9-75E7C2DC6FE6.png?v=1776944465";
+const moringaImage = "/images/moringa.jpeg";
 
 const farmImage =
   "https://media.istockphoto.com/id/2194911890/photo/back-lit-silhouette-of-male-farmer-standing-in-cultivated-soybean-field-in-summer-sunset.jpg?s=612x612&w=0&k=20&c=zgL3Yhxx4chRBdI0szfckOKWO4I8NU8gqrYQKYNze8k=";
@@ -242,7 +239,7 @@ export default function Home() {
                   src={honeyImage}
                   alt="Golden honey in a glass jar"
                   loading="lazy"
-                  className="h-[300px] w-full object-cover transition duration-700 group-hover:scale-105 sm:h-[370px]"
+                  className="h-[300px] w-full bg-white object-contain transition duration-700 group-hover:scale-105 sm:h-[370px]"
                 />
 
                 <span className="absolute left-5 top-5 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-[#244b35] shadow-sm">
@@ -286,7 +283,7 @@ export default function Home() {
                   src={moringaImage}
                   alt="Green botanical ingredients for moringa powder"
                   loading="lazy"
-                  className="h-[300px] w-full object-cover transition duration-700 group-hover:scale-105 sm:h-[370px]"
+                  className="h-[300px] w-full bg-white object-contain transition duration-700 group-hover:scale-105 sm:h-[370px]"
                 />
 
                 <span className="absolute left-5 top-5 rounded-full bg-white/95 px-4 py-2 text-xs font-semibold text-[#244b35] shadow-sm">
