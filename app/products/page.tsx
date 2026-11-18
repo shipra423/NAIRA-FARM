@@ -13,6 +13,7 @@ type Product = {
   alt: string;
   tag: string;
   price: number;
+  originalPrice?: number;
   featured: boolean;
   featuredOrder: number;
   category: string;
@@ -46,6 +47,9 @@ type ApiProduct = {
 // API product ko page ke Product format mein badalta hai
 function mapProduct(p: ApiProduct, index: number): Product {
   const category = p.category_detail?.name || "Other";
+  const regularPrice = Number(p.price) || 0;
+  const discountedPrice = p.discounted_price ? Number(p.discounted_price) : null;
+  const hasDiscount = discountedPrice !== null && discountedPrice > 0 && discountedPrice < regularPrice;
 
   return {
     name: p.name,
@@ -54,7 +58,8 @@ function mapProduct(p: ApiProduct, index: number): Product {
     image: p.image || "",
     alt: p.name,
     tag: category.toUpperCase(),
-    price: Number(p.discounted_price || p.price) || 0,
+    price: hasDiscount ? discountedPrice : regularPrice,
+    originalPrice: hasDiscount ? regularPrice : undefined,
     featured: p.is_featured,
     featuredOrder: index + 1,
     category,
@@ -1082,9 +1087,16 @@ Please confirm my order and delivery details.`;
                     </p>
 
                     {product.price > 0 ? (
-                      <p className="mt-5 text-2xl font-bold">
-                        ₹{product.price}
-                      </p>
+                      <div className="mt-5 flex items-baseline gap-2.5">
+                        <span className="text-2xl font-bold">
+                          ₹{product.price}
+                        </span>
+                        {product.originalPrice && (
+                          <span className="text-base font-normal text-gray-400 line-through">
+                            ₹{product.originalPrice}
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       <p className="mt-5 text-lg font-semibold">
                         Price on enquiry
